@@ -1,0 +1,19 @@
+{
+  "name": "utils",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/lodash": "^4.17.16"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "clean-deep": "^3.4.0",
+    "fuse.js": "^7.1.0",
+    "lodash": "^4.17.21",
+    "rfc6902": "^5.1.2"
+  }
+}

@@ -14,11 +14,18 @@
     >
       <q-menu class="shadow-0 bg-transparent" :offset="[0, 0]" fit ref="menu">
         <div class="p-2">
-          <div v-if="props?.useSearch">
-            <q-input dense outlined="" label="Rechercher ..."></q-input>
-          </div>
-          <div class="pt-1 border-[1px] bg-zinc-100 p-2 rounded-lg">
+          <div class="pt-1 border-[1px] bg-white p-2 rounded-lg">
+            <div class="px-2 mt-4" v-if="props?.useSearch">
+              <q-input
+                clearable=""
+                v-model="state.search"
+                dense
+                outlined=""
+                label="Rechercher ..."
+              ></q-input>
+            </div>
             <q-virtual-scroll
+              class="py-2"
               style="max-height: 26vh"
               :items="state.items"
               separator
@@ -40,7 +47,7 @@
                     ></q-icon>
                   </q-item-section>
                   <q-item-section>
-                    <q-item-label>
+                    <q-item-label class="text-sm">
                       {{ showLabel(item) }}
                     </q-item-label>
                   </q-item-section>
@@ -58,17 +65,17 @@
         </div>
       </q-menu>
       <q-field
-        :stack-label="false"
         class="no-pointer-events"
         v-bind="{
-          ..._.omit($attrs, ['label']),
+          ..._.omit($attrs, omitElement($attrs)),
         }"
+        :stack-label="setStackLabel($attrs)"
         outlined=""
       >
         <template v-if="props.prependIcon" #prepend>
           <div>
             <q-icon
-              size="20px"
+              size="17px"
               :color="setIconColor(state.selected) || ''"
               :name="setIconName(props.prependIcon)"
             ></q-icon>
@@ -90,7 +97,7 @@
           </div>
         </template>
         <template #control>
-          <q-item-label class="" :lines="1" v-if="state.selected">
+          <q-item-label :lines="1" v-if="state.selected">
             {{ showLabel(state.selected) }}
           </q-item-label>
           <div v-else>{{ $attrs?.label || "" }}</div>
@@ -101,20 +108,26 @@
 </template>
 
 <script setup lang="ts">
-import _ from "lodash";
-import { deepEqual } from "@/utils";
+import _, { set } from "lodash";
+import { deepEqual, TextSearch } from "@/utils";
 const model = defineModel();
 const props = defineProps<{
+  emitValue: boolean;
   useSearch?: boolean;
   options?: Array<any>;
   optionLabel?: string;
+  optionValue?: string;
   prependIcon?: string | Function;
   prependIconColor?: string | Function;
   appendIcon?: string | Function;
   locked?: boolean;
   useIcon?: boolean;
 }>();
+const textsearch = new TextSearch({
+  keys: [props?.optionLabel],
+});
 const state = reactive({
+  search: null,
   open: false,
   items: props?.options || [],
   selected: model.value || null,
@@ -128,6 +141,20 @@ watch(
 
 const menu = ref(null);
 
+watch(
+  () => state.search,
+  (value) => {
+    if (value) {
+      state.items = textsearch.search({
+        query: value,
+        items: props?.options || [],
+      });
+    } else {
+      state.items = props?.options || [];
+    }
+  }
+);
+
 function openMenu() {
   //alert("ok");
 
@@ -138,7 +165,31 @@ function openMenu() {
   state.open = true;
   //menu.value.show();
 }
+
+function omitElement() {
+  let omitArray = [] as Array<any>;
+  if (!model.value) {
+    omitArray.push("label");
+  }
+
+  return omitArray;
+}
+
+function setStackLabel(attrs: object = {}) {
+  // console.log("All ", attrs);
+  if (attrs["stack-label"] && model.value) {
+    return true;
+  } else {
+    return false;
+  }
+}
 function isActive(item: any) {
+  if (item == model.value && model.value) {
+    return true;
+  }
+  if (item[props?.optionValue || "value"] == model.value && model.value) {
+    return true;
+  }
   return deepEqual(state.selected, item);
 }
 
@@ -193,11 +244,19 @@ function selectItem(item) {
     state.selected = item;
   }
 
-  model.value = state.selected;
+  if (props?.emitValue) {
+    model.value = state.selected[props?.optionValue || "value"];
+  } else {
+    model.value = state.selected;
+  }
+
   menu.value.hide();
 }
 
 function showLabel(item) {
+  if (!props?.optionLabel) {
+    return item["label"] || item["name"] || item["title"] || item;
+  }
   if (typeof props?.optionLabel === "string") {
     return props.optionLabel ? item[props.optionLabel] : item;
   }

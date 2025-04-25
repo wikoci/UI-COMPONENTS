@@ -38,7 +38,7 @@
   </div>
 </template>
 <script setup lang="ts">
-const emit = defineEmits(["onClick"]);
+const emit = defineEmits(["onItemClick"]);
 type optionActionType = {
   id?: string;
   icon: string;
@@ -53,6 +53,6 @@ const props = defineProps<{
 
 function onClick(item: optionActionType) {
   if (item?.type === "separator") return;
-  emit("onClick", item);
+  emit("onItemClick", item);
 }
 </script>

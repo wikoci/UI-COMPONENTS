@@ -11,6 +11,7 @@
           <q-list :separator="true">
             <div v-for="item of props.options">
               <q-item
+                v-close-popup=""
                 dense
                 class="!py-2"
                 @click="onClick(item)"

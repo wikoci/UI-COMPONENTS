@@ -165,3 +165,21 @@ input {
     background-color: rgba(248, 248, 248, 0.97);
     border: 0.5px solid #e0e0e0;
 }
+
+.q-field--outlined .q-field__control:before {
+    border: 0.4px solid rgba(0, 0, 0, 0.29);
+    transition: border-color 0.36s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.q-field--outlined .q-field__control {
+
+    border-radius: 8px;
+    background: white;
+    /*-webkit-border-radius: 10px;
+    -moz-border-radius: 8px;
+    -ms-border-radius: 8px;
+    -o-border-radius: 8px;
+    */
+    -webkit-border-radius: 8px;
+    -webkit-border-radius: 8px;
+}

@@ -3,6 +3,7 @@
     <q-btn-dropdown
       content-class="shadow-0 bg-transparent !p-1"
       round
+      v-bind="$attrs"
       flat=""
       dropdown-icon="bi-three-dots-vertical"
     >
@@ -14,7 +15,7 @@
                 v-close-popup=""
                 dense
                 class="!py-2"
-                @click="onClick(item)"
+                v-bind="item"
                 v-if="item?.type !== 'separator'"
                 :clickable="true"
               >
@@ -40,7 +41,8 @@
 </template>
 <script setup lang="ts">
 const emit = defineEmits(["onItemClick"]);
-type optionActionType = {
+import type { QItemProps } from "quasar";
+type optionActionType = QItemProps & {
   id?: string;
   icon: string;
   label: string;
